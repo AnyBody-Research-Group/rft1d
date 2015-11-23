@@ -1,3 +1,4 @@
+from __future__ import print_function
 
 import numpy as np
 from matplotlib import pyplot
@@ -25,7 +26,7 @@ FWHMe      = [] #estimated FWHM
 for w in FWHM:
 	y      = rft1d.random.randn1d(nResponses, nodes, w, pad=False)  #broken fields
 	FWHMe.append(   rft1d.geom.estimate_fwhm(y)   )
-	print 'Actual FWHM: %06.3f, estimated FWHM: %06.3f' %(w, FWHMe[-1])
+	print('Actual FWHM: %06.3f, estimated FWHM: %06.3f' %(w, FWHMe[-1]))
 
 
 #(2) Plot results:

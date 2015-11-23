@@ -1,7 +1,8 @@
+from __future__ import absolute_import
 
 __version__  = '0.1.2'   #(2015.06.22)
 
-import data, distributions, geom, prob, random
+from . import data, distributions, geom, prob, random
 
 randn1d      = random.randn1d
 multirandn1d = random.multirandn1d

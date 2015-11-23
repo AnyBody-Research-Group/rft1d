@@ -79,11 +79,11 @@ class Generator1D(object):
 			self.nNodes = nodes
 		elif np.ma.is_mask(nodes):
 			if nodes.ndim!=1:
-				raise( ValueError('RFT1D Error:  the "nodes" argument must be a 1D boolean array. Received a %dD array'%arg.ndim)  )
+				raise ValueError('RFT1D Error:  the "nodes" argument must be a 1D boolean array. Received a %dD array'%arg.ndim)
 			self.nNodes = nodes.size
 			self.mask   = np.logical_not(nodes)
 		else:
-			raise( ValueError('RFT1D Error:  the "nodes" argument must be an integer or a 1D boolean array')  )
+			raise ValueError('RFT1D Error:  the "nodes" argument must be an integer or a 1D boolean array')
 
 	def _set_scale(self):
 		'''

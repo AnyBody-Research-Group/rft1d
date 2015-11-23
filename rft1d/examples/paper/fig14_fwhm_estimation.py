@@ -1,3 +1,4 @@
+from __future__ import print_function
 
 import numpy as np
 from matplotlib import pyplot
@@ -41,7 +42,7 @@ for w in W:
 		# y       = g.generate_sample()
 		we.append( rft1d.geom.estimate_fwhm(y) )
 	We.append(we)
-	print 'Actual FWHM: %06.3f, estimated FWHM: %06.3f' %(w, np.mean(We[-1]))
+	print('Actual FWHM: %06.3f, estimated FWHM: %06.3f' %(w, np.mean(We[-1])))
 We          = np.array(We)
 
 
