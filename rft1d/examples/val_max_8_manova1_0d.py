@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 
 from math import log
 import numpy as np
@@ -29,7 +32,7 @@ def here_manova1(Y, GROUP):
 	R0    = Y - X0*b0
 	R0    = R0.T*R0
 	### Wilk's lambda:
-	lam   = np.linalg.det(R) / np.linalg.det(R0)
+	lam   = old_div(np.linalg.det(R), np.linalg.det(R0))
 	### test statistic:
 	N,p,k = float(nResponses), float(nComponents), float(nGroups)
 	x2    = -((N-1) - 0.5*(p+k)) * log(lam)

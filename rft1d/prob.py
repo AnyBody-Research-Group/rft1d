@@ -5,6 +5,11 @@ The core RFT computations are conducted inside **prob.rft**, and the
 **RFTCalculator** class serves as a high-level interface to **prob.rft**
 '''
 from __future__ import absolute_import
+from __future__ import division
+from builtins import map
+from builtins import str
+from builtins import object
+from past.utils import old_div
 
 # Copyright (C) 2015  Todd Pataky
 # version: 0.1.1 (2015/04/26)
@@ -63,9 +68,9 @@ def p_bonferroni(STAT, z, df, Q, n=1):
 	elif STAT=='X2':
 		p     = stats.chi2.sf(z, df[1])
 	elif STAT=='T2':
-		p,m   = map(float,df)
+		p,m   = list(map(float,df))
 		v0,v1 = p, m - p + 1
-		zz    = z * ( (m-p+1)/(p*m) )
+		zz    = z * ( old_div((m-p+1),(p*m)) )
 		p     = stats.f.sf(zz, v0, v1)
 	p         = Q * (p**n)
 	return min(p, 1)
@@ -101,8 +106,8 @@ def ec_density_T(z, df):
 	'''
 	v    = float(df[1])
 	a    = FOUR_LOG2
-	b    = np.exp((gammaln((v+1)/2) - gammaln(v/2)))
-	c    = (1+z**2/v)**((1-v)/2)
+	b    = np.exp((gammaln(old_div((v+1),2)) - gammaln(old_div(v,2))))
+	c    = (1+old_div(z**2,v))**(old_div((1-v),2))
 	EC   = []
 	EC.append(  1 - stats.t.cdf(z,v)  )  #dim: 0
 	EC.append(  a**0.5 / TWO_PI * c  )   #dim: 1
@@ -111,19 +116,19 @@ def ec_density_T(z, df):
 def ec_density_F(z, df):
 	if z<0:   
 		return [1, np.inf]    #to bypass warnings in critical threshold calculation
-	k,v  = map(float, df)
+	k,v  = list(map(float, df))
 	k    = max(k, 1.0)        #stats.f.cdf will return nan if k is less than 1
-	a    = FOUR_LOG2/TWO_PI
-	b    = gammaln(v/2) + gammaln(k/2)
+	a    = old_div(FOUR_LOG2,TWO_PI)
+	b    = gammaln(old_div(v,2)) + gammaln(old_div(k,2))
 	EC   = []
 	EC.append(  1 - stats.f.cdf(z, k, v)  )
-	EC.append(  a**0.5 * np.exp(gammaln((v+k-1)/2)-b)*2**0.5 *(k*z/v)**(0.5*(k-1))*(1+k*z/v)**(-0.5*(v+k-2))  )
+	EC.append(  a**0.5 * np.exp(gammaln(old_div((v+k-1),2))-b)*2**0.5 *(k*z/v)**(0.5*(k-1))*(1+k*z/v)**(-0.5*(v+k-2))  )
 	return EC
 
 def ec_density_X2(z, df):
 	v    = float(df[1])
-	a    = FOUR_LOG2 / TWO_PI
-	b    = z ** ((v-1)/2)  * np.exp(-z/2 -gammaln(v/2))  /  (2**((v-2)/2))
+	a    = old_div(FOUR_LOG2, TWO_PI)
+	b    = z ** (old_div((v-1),2))  * np.exp(old_div(-z,2) -gammaln(old_div(v,2)))  /  (2**(old_div((v-2),2)))
 	EC   = []
 	EC.append(  1 - stats.chi2.cdf(z,v)  )
 	EC.append(  a**0.5 * b  )
@@ -140,9 +145,9 @@ def ec_density(STAT, z, df):
 	elif STAT=='X2':
 		return ec_density_X2(z, df)
 	elif STAT=='T2':
-		p,m  = map(float,df)
+		p,m  = list(map(float,df))
 		df_F = p, m - p + 1
-		zz   = z * ( (m-p+1)/(p*m) )
+		zz   = z * ( old_div((m-p+1),(p*m)) )
 		return ec_density_F(zz, df_F)
 	else:
 		raise ValueError('Statistic must be one of: ["Z", "T", "X2", "F", "T2"]')
@@ -280,14 +285,14 @@ def rft(c, k, STAT, Z, df, R, n=1, Q=None, expectations_only=False, version='spm
 		### FASTER CODE (Edit TCP 2013.12.02) -- in 1D case this is about 25 times faster than using np.linalg.matrix_power
 		# a,b   = EC*G
 		# P     = a**n, n*b*a**(n-1)
-		G    = sqrt(pi) / (gamma(0.5*np.arange(1,D+1)))
+		G    = old_div(sqrt(pi), (gamma(0.5*np.arange(1,D+1))))
 		a,b  = EC*G
 		P    = a**n, n*b*a**(n-1)
 		EM   = R/G*P
 		EN   = P[0]*R[-1]
 	### expected maxima and resels per cluster:
 	Ec       = EM.sum()   #previously "Em"
-	Ek       = EN/EM[-1]  #previously "En"
+	Ek       = old_div(EN,EM[-1])  #previously "En"
 	if expectations_only:
 		return Ec,Ek,EN
 	### compute probabilities:  first P{n>k}
@@ -295,8 +300,8 @@ def rft(c, k, STAT, Z, df, R, n=1, Q=None, expectations_only=False, version='spm
 	if (k==0) or (D==0):
 		p    = 1.0
 	else:
-		beta = (gamma(0.5*D+1)/Ek) **(2/D)
-		p    = np.exp( -beta*(k**(2/D)) )
+		beta = (old_div(gamma(0.5*D+1),Ek)) **(old_div(2,D))
+		p    = np.exp( -beta*(k**(old_div(2,D))) )
 	#Poisson clumping heuristic (for multiple clusters)
 	if p==0:
 		P    = 0
@@ -323,7 +328,7 @@ def rft(c, k, STAT, Z, df, R, n=1, Q=None, expectations_only=False, version='spm
 def _approx_threshold(STAT, alpha, df, resels, n):
 	# if two_tailed:
 	# 	alpha   = 0.5*alpha
-	a   = (alpha/sum(resels))**(1.0/n)
+	a   = (old_div(alpha,sum(resels)))**(old_div(1.0,n))
 	if STAT=='Z':
 		zstar = stats.norm.isf(a)
 	elif STAT=='T':
@@ -333,10 +338,10 @@ def _approx_threshold(STAT, alpha, df, resels, n):
 	elif STAT=='F':
 		zstar = stats.f.isf(a, df[0], df[1])
 	elif STAT=='T2':
-		p,m   = map(float,df)
+		p,m   = list(map(float,df))
 		df_F  = p, m - p + 1
 		fstar = stats.f.isf(a, df_F[0], df_F[1])
-		zstar = fstar / ( (m-p+1)/(p*m) )
+		zstar = old_div(fstar, ( old_div((m-p+1),(p*m)) ))
 	else:
 		raise ValueError('Statistic must be one of: "Z", "T", "X2", "F", "T2"')
 	return zstar
@@ -649,7 +654,7 @@ class RFTCalculator(object):
 	def set_fwhm(self, w):
 		self.FWHM   = float(w)
 		if self.mask==None:
-			self.resels = 1, (self.nNodes-1)/self.FWHM  #field length is (nNodes - 1)
+			self.resels = 1, old_div((self.nNodes-1),self.FWHM)  #field length is (nNodes - 1)
 		else:
 			self.resels = geom.resel_counts(self.mask, fwhm=self.FWHM)
 	def sf(self, u):

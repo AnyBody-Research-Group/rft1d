@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import zip
+from past.utils import old_div
 
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d
@@ -8,7 +11,7 @@ import rft1d
 ### EPS production preliminaries:
 fig_width_mm  = 100
 fig_height_mm = 80
-mm2in = 1/25.4
+mm2in = old_div(1,25.4)
 fig_width  = fig_width_mm*mm2in  	# width in inches
 fig_height = fig_height_mm*mm2in    # height in inches
 params = {	'backend':'ps', 'axes.labelsize':14,

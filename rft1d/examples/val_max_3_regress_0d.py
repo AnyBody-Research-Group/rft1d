@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 
 from math import sqrt
 import numpy as np
@@ -19,9 +22,9 @@ def tstat_regress(Y, x):
 	eij    = Y - X*b                        #residuals
 	R      = eij.T*eij                      #residuals sum of squares
 	df     = Y.shape[0] - 2                 #degrees of freedom
-	sigma2 = np.diag(R)/df                  #variance
+	sigma2 = old_div(np.diag(R),df)                  #variance
 	### compute t statistic
-	return np.array(c.T*b).flatten()  /   np.sqrt(sigma2*float(c.T*(np.linalg.inv(X.T*X))*c))
+	return old_div(np.array(c.T*b).flatten(),   np.sqrt(sigma2*float(c.T*(np.linalg.inv(X.T*X))*c)))
 
 
 

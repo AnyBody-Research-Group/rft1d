@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d
@@ -21,8 +23,8 @@ yB       = gaussian_filter1d(yB, 8.0, axis=1, mode='wrap')
 nA,nB    = yA.shape[0], yB.shape[0]  #sample sizes
 mA,mB    = yA.mean(axis=0), yB.mean(axis=0)  #means
 sA,sB    = yA.std(ddof=1, axis=0), yB.std(ddof=1, axis=0)  #standard deviations
-s        = np.sqrt(    ((nA-1)*sA*sA + (nB-1)*sB*sB)  /  (nA + nB - 2)     )  #pooled standard deviation
-t        = (mA-mB) / ( s *np.sqrt(1.0/nA + 1.0/nB))  #t field
+s        = np.sqrt(    old_div(((nA-1)*sA*sA + (nB-1)*sB*sB),  (nA + nB - 2))     )  #pooled standard deviation
+t        = old_div((mA-mB), ( s *np.sqrt(old_div(1.0,nA) + old_div(1.0,nB))))  #t field
 
 
 
@@ -44,7 +46,7 @@ tstar    = rft1d.t.isf(alpha, df, Q, FWHM) #inverse survival function
 #(4) Get upcrossing metrics:
 calc      = rft1d.geom.ClusterMetricCalculator()
 k         = calc.cluster_extents(t, tstar, interp=True)
-k_resels  = [kk/FWHM for kk in k]
+k_resels  = [old_div(kk,FWHM) for kk in k]
 nClusters = len(k)
 
 

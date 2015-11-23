@@ -1,3 +1,7 @@
+from __future__ import division
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 
 import numpy as np
 from matplotlib import pyplot
@@ -42,7 +46,7 @@ K       = [[calc.cluster_extents(yy, h, interp, wrap)   for yy in T]  for h in h
 ### compute number of upcrossings above a threshold:
 C       = np.array([[[  sum([kkk>=k0 for kkk in kk])  for kk in k]  for k in K]   for k0 in K0])
 P       = np.mean(C>=c, axis=2).T
-P0      = np.array([[rftcalc.p.set(c, k0, h)  for h in heights]  for k0 in K0/FWHM]).T
+P0      = np.array([[rftcalc.p.set(c, k0, h)  for h in heights]  for k0 in old_div(K0,FWHM)]).T
 
 
 

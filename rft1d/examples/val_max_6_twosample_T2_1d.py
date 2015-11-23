@@ -1,3 +1,7 @@
+from __future__ import division
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 
 import numpy as np
 from matplotlib import pyplot
@@ -11,7 +15,7 @@ def here_hotellingsT2_2samp(yA, yB):
 	for ii,(mmA,mmB) in enumerate(zip(mA,mB)):
 		yyA,yyB = np.matrix(yA[:,ii,:]), np.matrix(yB[:,ii,:])
 		WA,WB   = np.cov(yyA.T), np.cov(yyB.T)
-		W       = ((NA-1)*WA + (NB-1)*WB) / (N-2)
+		W       = old_div(((NA-1)*WA + (NB-1)*WB), (N-2))
 		t2      = (NA*NB)/float(NA+NB)  * (mmB-mmA) * np.linalg.inv(W) * (mmB-mmA).T
 		T2.append(  float(t2)  )
 	return np.asarray(T2)

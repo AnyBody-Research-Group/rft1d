@@ -6,6 +6,8 @@ Note:
 When FWHM gets large (2FWHM>nNodes), the data should be padded prior to filtering.
 Use **rft1d.random.randn1d** for optional padding.
 '''
+from __future__ import division
+from past.utils import old_div
 
 
 
@@ -26,7 +28,7 @@ FWHM       = 20.0
 #(1) Generate Gaussian 1D fields:
 y          = np.random.randn(nResponses, nNodes)
 #convolve with a Gaussian kernel:
-sd         = FWHM / np.sqrt(8*np.log(2))
+sd         = old_div(FWHM, np.sqrt(8*np.log(2)))
 y          = gaussian_filter1d(y, sd, axis=1, mode='wrap')
 #scale to unit variance:
 '''
@@ -36,14 +38,14 @@ Downloaded from http://www.fil.ion.ucl.ac.uk/~wpenny/mbi/index.html on 1 Aug 201
 '''
 ### define Gaussian kernel
 t          = np.arange(  -0.5*(nNodes-1) , 0.5*(nNodes-1)+1  )
-gf         = np.exp(-(t**2) / (2*sd**2))
+gf         = np.exp(old_div(-(t**2), (2*sd**2)))
 gf        /= gf.sum()
 ### expected variance for this kernel
 AG         = np.fft.fft(gf)
 Pag        = AG * np.conj(AG)  #power of the noise
 COV        = np.real( np.fft.ifft(Pag) )
 svar       = COV[0]
-scale      = np.sqrt(1.0/svar)
+scale      = np.sqrt(old_div(1.0,svar))
 ### scale the data:
 y         *= scale
 

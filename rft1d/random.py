@@ -6,6 +6,9 @@ The functions **randn1d** and **multirandn1d** are similar to the
 If a large number of random fields are required (e.g. for RFT validations)
 it may be more efficient to use the **Generator1D** and **GeneratorMulti1D** classes.
 '''
+from __future__ import division
+from builtins import object
+from past.utils import old_div
 
 # Copyright (C) 2015  Todd Pataky
 # version: 0.1.1 (2015/04/26)
@@ -95,14 +98,14 @@ class Generator1D(object):
 			self.SCALE     = None
 		else:
 			t       = np.arange(  -0.5*(self.nNodes-1) , 0.5*(self.nNodes-1)+1  )
-			gf      = np.exp(-(t**2) / (2*self.SD**2 + eps))
+			gf      = np.exp(old_div(-(t**2), (2*self.SD**2 + eps)))
 			gf     /= gf.sum()
 			# expected variance for this kernel
 			AG      = np.fft.fft(gf)
 			Pag     = AG * np.conj(AG)  #power of the noise
 			COV     = np.real( np.fft.ifft(Pag) )
 			svar    = COV[0]
-			self.SCALE = sqrt(1.0/svar)
+			self.SCALE = sqrt(old_div(1.0,svar))
 
 	def _set_qi0i1(self, w):
 		if np.isinf(w):
@@ -116,7 +119,7 @@ class Generator1D(object):
 			if w>50:
 				q  += n*(w-50)
 			self.q  = int(q)
-			self.i0 = self.q/2 - n/2
+			self.i0 = old_div(self.q,2) - old_div(n,2)
 			self.i1 = self.i0 + n
 		else:
 			self.q  = self.nNodes
@@ -142,7 +145,7 @@ class Generator1D(object):
 
 	def set_fwhm(self, fwhm):
 		self.FWHM  = float(fwhm)
-		self.SD    = self.FWHM / sqrt(8*log(2))
+		self.SD    = old_div(self.FWHM, sqrt(8*log(2)))
 		self._set_scale()
 		self._set_qi0i1(self.FWHM)
 

@@ -23,6 +23,11 @@ or
    ./rft1d/examples/paper/fig*.py
 '''
 from __future__ import print_function
+from __future__ import division
+from builtins import zip
+from builtins import chr
+from builtins import range
+from past.utils import old_div
 
 
 
@@ -462,7 +467,7 @@ print()
 import rft1d
 nNodes = 101
 FWHM = 8.0
-k = 1.7 / FWHM
+k = old_div(1.7, FWHM)
 u = 3.0
 p = rft1d.norm.p_cluster(k, u, nNodes, FWHM)
 print('Example 10.1 (Page 10):')
@@ -476,7 +481,7 @@ import rft1d
 c = 2
 nNodes = 101
 FWHM = 8.0
-k = 0.7 / FWHM
+k = old_div(0.7, FWHM)
 u = 3.0
 p = rft1d.norm.p_set(c, k, u, nNodes, FWHM)
 print('Example 10.2 (Page 10):')
@@ -805,7 +810,7 @@ wrap = False
 y = rft1d.randn1d(1000, nNodes, FWHM)
 kmax = [calc.max_cluster_extent(yy, u, interp, wrap)  for yy in y]
 k0_nodes = 2.0
-k0_resels = k0_nodes / FWHM
+k0_resels = old_div(k0_nodes, FWHM)
 p_simulated = (np.array(kmax) >= k0_nodes).mean()
 p_expected = rft1d.norm.p_cluster(k0_resels, u, nNodes, FWHM)
 print('Example 14.2 (Pages 14-15):')
@@ -820,7 +825,7 @@ import rft1d
 nNodes = 101
 FWHM = 10.0
 u = 3.0
-kmin_resels = 2.0 / FWHM
+kmin_resels = old_div(2.0, FWHM)
 c = 2
 calc = rft1d.geom.ClusterMetricCalculator()
 interp = True
@@ -862,7 +867,7 @@ for ax in [ax0,ax1]:
 	ax.hlines(0, 0, 100, color='k', linestyle='-', lw=0.5)
 	ax.hlines(h, 0, 100, color=color0, linestyle='--')
 ### plot nNodes:
-ind   = range(25,38)
+ind   = list(range(25,38))
 ax1.plot(ind, y[ind], 'o', markersize=6, markerfacecolor=color1, markeredgecolor=color0)
 ax1.plot(ind, [h]*len(ind), 'o', markersize=6, markerfacecolor=color1, markeredgecolor=color0)
 for i in ind:
@@ -921,7 +926,7 @@ rftcalc      = rft1d.prob.RFTCalculator(STAT='Z', nodes=nNodes, FWHM=FWHM)
 K0      = np.linspace(eps, 15, 21)
 K       = np.array([[calc.max_cluster_extent(yy, h, interp, wrap)   for yy in y]  for h in heights])
 P       = np.array([(K>=k0).mean(axis=1)  for k0 in K0]).T
-P0      = np.array([[rftcalc.p.cluster(k0, h)  for k0 in K0/FWHM]  for h in heights])
+P0      = np.array([[rftcalc.p.cluster(k0, h)  for k0 in old_div(K0,FWHM)]  for h in heights])
 ### plot:
 pyplot.figure(11)
 colors  = ['b', 'g', 'r', 'orange']
@@ -977,7 +982,7 @@ K       = [[calc.cluster_extents(yy, h, interp, wrap)   for yy in y]  for h in h
 ### compute number of upcrossings above a threshold:
 C       = np.array([[[  sum([kkk>=k0 for kkk in kk])  for kk in k]  for k in K]   for k0 in K0])
 P       = np.mean(C>=c, axis=2).T
-P0      = np.array([[rftcalc.p.set(c, k0, h)  for h in heights]  for k0 in K0/FWHM]).T
+P0      = np.array([[rftcalc.p.set(c, k0, h)  for h in heights]  for k0 in old_div(K0,FWHM)]).T
 ### plot results:
 pyplot.figure(12)
 colors  = ['b', 'g', 'r']
@@ -1127,8 +1132,8 @@ yB       = gaussian_filter1d(yB, 8.0, axis=1, mode='wrap')
 nA,nB    = yA.shape[0], yB.shape[0]  #sample sizes
 mA,mB    = yA.mean(axis=0), yB.mean(axis=0)  #means
 sA,sB    = yA.std(ddof=1, axis=0), yB.std(ddof=1, axis=0)  #standard deviations
-s        = np.sqrt(    ((nA-1)*sA*sA + (nB-1)*sB*sB)  /  (nA + nB - 2)     )  #pooled SD
-t        = (mA-mB) / ( s *np.sqrt(1.0/nA + 1.0/nB))  #t field
+s        = np.sqrt(    old_div(((nA-1)*sA*sA + (nB-1)*sB*sB),  (nA + nB - 2))     )  #pooled SD
+t        = old_div((mA-mB), ( s *np.sqrt(old_div(1.0,nA) + old_div(1.0,nB))))  #t field
 ### field smoothness estimate:
 rA,rB    = yA-mA, yB-mB  #residuals
 r        = np.vstack([rA,rB])
@@ -1141,7 +1146,7 @@ tstar    = rft1d.t.isf(alpha, df, Q, FWHM) #inverse survival function
 ### upcrossing metrics:
 calc      = rft1d.geom.ClusterMetricCalculator()
 k         = calc.cluster_extents(t, tstar, interp=True)
-k_resels  = [kk/FWHM for kk in k]
+k_resels  = [old_div(kk,FWHM) for kk in k]
 nClusters = len(k)
 ### probabilities
 rftcalc  = rft1d.prob.RFTCalculator(STAT='T', df=(1,df), nodes=Q, FWHM=FWHM)
@@ -1194,8 +1199,8 @@ yB       = gaussian_filter1d(yB, 8.0, axis=1, mode='wrap')
 nA,nB    = yA.shape[0], yB.shape[0]  #sample sizes
 mA,mB    = yA.mean(axis=0), yB.mean(axis=0)  #means
 sA,sB    = yA.std(ddof=1, axis=0), yB.std(ddof=1, axis=0)  #standard deviations
-s        = np.sqrt(    ((nA-1)*sA*sA + (nB-1)*sB*sB)  /  (nA + nB - 2)     )  #pooled SD
-t        = (mA-mB) / ( s *np.sqrt(1.0/nA + 1.0/nB))  #t field
+s        = np.sqrt(    old_div(((nA-1)*sA*sA + (nB-1)*sB*sB),  (nA + nB - 2))     )  #pooled SD
+t        = old_div((mA-mB), ( s *np.sqrt(old_div(1.0,nA) + old_div(1.0,nB))))  #t field
 ### field smoothness estimate:
 rA,rB    = yA-mA, yB-mB  #residuals
 r        = np.vstack([rA,rB])
@@ -1209,7 +1214,7 @@ tstar    = rft1d.t.isf(alpha, df, Q, FWHM) #inverse survival function
 calc      = rft1d.geom.ClusterMetricCalculator()
 k         = calc.cluster_extents(t, tstar, interp=True)
 ### circular field probabilities:
-kcirc    = sum(k) / FWHM  #wrapped into a single upcrossing
+kcirc    = old_div(sum(k), FWHM)  #wrapped into a single upcrossing
 ccirc    = 1  #single upcrossing
 rftcalc  = rft1d.prob.RFTCalculator(STAT='T', df=(1,df), nodes=Q, FWHM=FWHM)
 Psetcirc = rftcalc.p.set(ccirc, kcirc, tstar)
@@ -1267,8 +1272,8 @@ def here_tstat2(yA, yB):
 	nA,nB  = yA.shape[0], yB.shape[0]
 	mA,mB  = yA.mean(axis=0), yB.mean(axis=0)
 	sA,sB  = yA.std(ddof=1, axis=0), yB.std(ddof=1, axis=0)
-	s      = np.sqrt(    ((nA-1)*sA*sA + (nB-1)*sB*sB)  /  (nA + nB - 2)     )
-	t      = (mA-mB) / ( s *np.sqrt(1.0/nA + 1.0/nB))
+	s      = np.sqrt(    old_div(((nA-1)*sA*sA + (nB-1)*sB*sB),  (nA + nB - 2))     )
+	t      = old_div((mA-mB), ( s *np.sqrt(old_div(1.0,nA) + old_div(1.0,nB))))
 	return t
 t0       = here_tstat2(yA, yB)
 ### random label permutations:

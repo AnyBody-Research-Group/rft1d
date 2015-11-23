@@ -1,3 +1,7 @@
+from __future__ import division
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 
 import numpy as np
 from matplotlib import pyplot
@@ -38,7 +42,7 @@ T           = np.asarray(T)
 K0      = np.linspace(eps, 12, 21)
 K       = np.array([[calc.max_cluster_extent(yy, h, interp, wrap)   for yy in T]  for h in heights])
 P       = np.array([(K>=k0).mean(axis=1)  for k0 in K0]).T
-P0      = np.array([[rftcalc.p.cluster(k0, h)  for k0 in K0/FWHM]  for h in heights])
+P0      = np.array([[rftcalc.p.cluster(k0, h)  for k0 in old_div(K0,FWHM)]  for h in heights])
 
 
 

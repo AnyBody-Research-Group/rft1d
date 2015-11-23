@@ -1,3 +1,7 @@
+from __future__ import division
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 
 import numpy as np
 from matplotlib import pyplot
@@ -34,13 +38,13 @@ def plot_filled(y, ax, thresh=None, plot_thresh=True, color='k', lw=2, facecolor
 			### interpolate if necessary:
 			if ind[0]  != ind0[0]:
 				dx      = x0[ind[0]] - x0[ind[0]-1]
-				dy      = (csign*thresh - y0[ind[0]])  / (y0[ind[0]] - y0[ind[0]-1])
+				dy      = old_div((csign*thresh - y0[ind[0]]), (y0[ind[0]] - y0[ind[0]-1]))
 				x[0]   += dy*dx
 			if ind[-1] != ind0[-1]:
 				dx      = x0[ind[-1]+1] - x0[ind[-1]]
-				dy      = (csign*thresh - y0[ind[-1]])  / (y0[ind[-1]+1] - y0[ind[-1]])
+				dy      = old_div((csign*thresh - y0[ind[-1]]), (y0[ind[-1]+1] - y0[ind[-1]]))
 				x[-1]  += dy*dx
-			polyg.append(  Polygon(zip(x,y))  )
+			polyg.append(  Polygon(list(zip(x,y)))  )
 		patches         = PatchCollection(polyg, edgecolors=None)
 		ax.add_collection(patches)
 		pyplot.setp(patches, facecolor=facecolor, edgecolor=facecolor)
@@ -59,7 +63,7 @@ def plot_filled(y, ax, thresh=None, plot_thresh=True, color='k', lw=2, facecolor
 ### EPS production preliminaries:
 fig_width_mm  = 200
 fig_height_mm = 85
-mm2in = 1/25.4
+mm2in = old_div(1,25.4)
 fig_width  = fig_width_mm*mm2in  	# width in inches
 fig_height = fig_height_mm*mm2in    # height in inches
 params = {	'backend':'ps', 'axes.labelsize':14,
@@ -97,7 +101,7 @@ for ax in [ax0,ax1]:
 	ax.hlines(0, 0, 100, color='k', linestyle='-', lw=0.5)
 	ax.hlines(h, 0, 100, color=color0, linestyle='--')
 ### plot nNodes:
-ind   = range(25,38)
+ind   = list(range(25,38))
 ax1.plot(ind, y[ind], 'o', markersize=6, markerfacecolor=color1, markeredgecolor=color0)
 ax1.plot(ind, [h]*len(ind), 'o', markersize=6, markerfacecolor=color1, markeredgecolor=color0)
 for i in ind:

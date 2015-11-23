@@ -1,3 +1,8 @@
+from __future__ import division
+from builtins import zip
+from builtins import chr
+from builtins import range
+from past.utils import old_div
 
 import numpy as np
 from matplotlib import pyplot,cm
@@ -11,7 +16,7 @@ def scalar2color(x, cmap=cm.jet, xmin=None, xmax=None):
 		xmin   = x.min()
 	if xmax==None:
 		xmax   = x.max()
-	xn         = (x - xmin)  / (xmax-xmin)
+	xn         = old_div((x - xmin), (xmax-xmin))
 	xn        *= 255
 	xn         = np.asarray(xn, dtype=int)
 	colors     = cmap(xn)
@@ -20,7 +25,7 @@ def scalar2color(x, cmap=cm.jet, xmin=None, xmax=None):
 ### EPS production preliminaries:
 fig_width_mm  = 240
 fig_height_mm = 120
-mm2in = 1/25.4
+mm2in = old_div(1,25.4)
 fig_width  = fig_width_mm*mm2in  	# width in inches
 fig_height = fig_height_mm*mm2in    # height in inches
 params = {	'backend':'ps', 'axes.labelsize':14,
@@ -40,7 +45,7 @@ seed        = [18]*5 + [0]
 nResponses  = 8
 nNodes      = 101
 W           = [0, 5, 10, 20, 50, np.inf]
-colors      = scalar2color(range(nResponses+3), cmap=cm.PuRd)
+colors      = scalar2color(list(range(nResponses+3)), cmap=cm.PuRd)
 # Y           = [rft1d.random.randn1d(nNodes, w, nResponses)  for w in W]
 Y           = []
 for s,w in zip(seed,W):

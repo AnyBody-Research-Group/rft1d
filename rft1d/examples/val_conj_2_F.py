@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 
 import numpy as np
 from matplotlib import pyplot
@@ -17,7 +20,7 @@ def here_anova1(Y, X, X0, Xi, X0i, df):
 	eij0      = Y - X0*b0
 	R0        = eij0.T*eij0
 	### compute F statistic:
-	F         = ((np.diag(R0)-np.diag(R))/df[0]) / (np.diag(R+eps)/df[1])
+	F         = old_div((old_div((np.diag(R0)-np.diag(R)),df[0])), (old_div(np.diag(R+eps),df[1])))
 	return F
 
 def here_design_matrices(nResponses, nGroups):

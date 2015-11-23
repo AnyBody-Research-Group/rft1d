@@ -1,3 +1,8 @@
+from __future__ import division
+from builtins import chr
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 
 import numpy as np
 from matplotlib import pyplot
@@ -10,7 +15,7 @@ import rft1d
 ### EPS production preliminaries:
 fig_width_mm  = 240
 fig_height_mm = 120
-mm2in = 1/25.4
+mm2in = old_div(1,25.4)
 fig_width  = fig_width_mm*mm2in  	# width in inches
 fig_height = fig_height_mm*mm2in    # height in inches
 params = {	'backend':'ps', 'axes.labelsize':14,
@@ -51,13 +56,13 @@ def plot_filled(y, ax, thresh=None, plot_thresh=True, color='k', lw=2, facecolor
 			### interpolate if necessary:
 			if ind[0]  != ind0[0]:
 				dx      = x0[ind[0]] - x0[ind[0]-1]
-				dy      = (csign*thresh - y0[ind[0]])  / (y0[ind[0]] - y0[ind[0]-1])
+				dy      = old_div((csign*thresh - y0[ind[0]]), (y0[ind[0]] - y0[ind[0]-1]))
 				x[0]   += dy*dx
 			if ind[-1] != ind0[-1]:
 				dx      = x0[ind[-1]+1] - x0[ind[-1]]
-				dy      = (csign*thresh - y0[ind[-1]])  / (y0[ind[-1]+1] - y0[ind[-1]])
+				dy      = old_div((csign*thresh - y0[ind[-1]]), (y0[ind[-1]+1] - y0[ind[-1]]))
 				x[-1]  += dy*dx
-			polyg.append(  Polygon(zip(x,y))  )
+			polyg.append(  Polygon(list(zip(x,y)))  )
 		patches         = PatchCollection(polyg, edgecolors=None)
 		ax.add_collection(patches)
 		pyplot.setp(patches, facecolor=facecolor, edgecolor=facecolor)

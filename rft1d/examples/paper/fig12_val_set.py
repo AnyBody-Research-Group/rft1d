@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import zip
+from past.utils import old_div
 
 import numpy as np
 from scipy import stats
@@ -13,7 +16,7 @@ eps        = np.finfo(float).eps   #smallest float
 ### EPS production preliminaries:
 fig_width_mm  = 100
 fig_height_mm = 80
-mm2in = 1/25.4
+mm2in = old_div(1,25.4)
 fig_width  = fig_width_mm*mm2in  	# width in inches
 fig_height = fig_height_mm*mm2in    # height in inches
 params = {	'backend':'ps', 'axes.labelsize':14,
@@ -52,7 +55,7 @@ K       = [[calc.cluster_extents(yy, h, interp, wrap)   for yy in y]  for h in h
 ### compute number of upcrossings above a threshold:
 C       = np.array([[[  sum([kkk>=k0 for kkk in kk])  for kk in k]  for k in K]   for k0 in K0])
 P       = np.mean(C>=c, axis=2).T
-P0      = np.array([[rftcalc.p.set(c, k0, h)  for h in heights]  for k0 in K0/FWHM]).T
+P0      = np.array([[rftcalc.p.set(c, k0, h)  for h in heights]  for k0 in old_div(K0,FWHM)]).T
 
 
 

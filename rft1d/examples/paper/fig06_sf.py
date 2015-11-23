@@ -1,3 +1,7 @@
+from __future__ import division
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 
 import numpy as np
 from scipy import stats
@@ -12,7 +16,7 @@ def scalar2color(x, cmap=cm.jet, xmin=None, xmax=None):
 		xmin   = x.min()
 	if xmax==None:
 		xmax   = x.max()
-	xn         = (x - xmin)  / (xmax-xmin)
+	xn         = old_div((x - xmin), (xmax-xmin))
 	xn        *= 255
 	xn         = np.asarray(xn, dtype=int)
 	colors     = cmap(xn)
@@ -23,7 +27,7 @@ def scalar2color(x, cmap=cm.jet, xmin=None, xmax=None):
 ### EPS production preliminaries:
 fig_width_mm  = 100
 fig_height_mm = 80
-mm2in = 1/25.4
+mm2in = old_div(1,25.4)
 fig_width  = fig_width_mm*mm2in  	# width in inches
 fig_height = fig_height_mm*mm2in    # height in inches
 params = {	'backend':'ps', 'axes.labelsize':14,
@@ -60,7 +64,7 @@ sfN        = stats.norm.sf(heights)
 #(4) Plot results:
 pyplot.close('all')
 ax         = pyplot.axes([0.15,0.14,0.82,0.84])
-colors     = scalar2color(range(len(WW)+2), cmap=cm.PuRd)
+colors     = scalar2color(list(range(len(WW)+2)), cmap=cm.PuRd)
 for W,sfE,c in zip(WW,SFE,colors[2:]):
 	ax.plot(heights, sfE, '-', color=c, label='FWHM = %d%%'%W)
 ax.plot(heights, sfN, 'k-', lw=3, label='Standard normal')

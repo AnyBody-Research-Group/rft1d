@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import zip
+from past.utils import old_div
 
 import numpy as np
 from scipy import stats
@@ -13,7 +16,7 @@ eps        = np.finfo(float).eps   #smallest float
 ### EPS production preliminaries:
 fig_width_mm  = 100
 fig_height_mm = 80
-mm2in = 1/25.4
+mm2in = old_div(1,25.4)
 fig_width  = fig_width_mm*mm2in  	# width in inches
 fig_height = fig_height_mm*mm2in    # height in inches
 params = {	'backend':'ps', 'axes.labelsize':14,
@@ -49,7 +52,7 @@ rftcalc      = rft1d.prob.RFTCalculator(STAT='Z', nodes=nNodes, FWHM=FWHM)
 K0      = np.linspace(eps, 15, 21)
 K       = np.array([[calc.max_cluster_extent(yy, h, interp, wrap)   for yy in y]  for h in heights])
 P       = np.array([(K>=k0).mean(axis=1)  for k0 in K0]).T
-P0      = np.array([[rftcalc.p.cluster(k0, h)  for k0 in K0/FWHM]  for h in heights])
+P0      = np.array([[rftcalc.p.cluster(k0, h)  for k0 in old_div(K0,FWHM)]  for h in heights])
 
 
 

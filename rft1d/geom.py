@@ -4,6 +4,11 @@ Geometry module
 This module contains functions for computing various geomtric characteristics
 of 1D fields and upcrossings.
 '''
+from __future__ import division
+from builtins import zip
+from builtins import range
+from builtins import object
+from past.utils import old_div
 
 # Copyright (C) 2015  Todd Pataky
 # version: 0.1.1 (2015/04/26)
@@ -50,7 +55,7 @@ class Upcrossing(object):
 		y0,y1 = y[i0], y[i1]
 		x0    = float(i0)
 		m     = y1-y0
-		x     = (h-y0)/m + x0
+		x     = old_div((h-y0),m) + x0
 		return x
 
 	def endpoints(self, yi, h):
@@ -370,7 +375,7 @@ class ClusterMetricCalculator(object):
 		
 		.. danger:: Setting *interp* to False is faster, but it will cause disagreements between node-based and element-based sampling. If the upcrossing is large this difference is negligible, but for small upcrossing there may be strange results (e.g. upcrossing with an extent of zero). Recommendation: **always interpolate**.
 		'''
-		return self.total_excursion_set_extent(y, u, interp=interp) / float(fwhm)
+		return old_div(self.total_excursion_set_extent(y, u, interp=interp), float(fwhm))
 		
 	
 	def nUpcrossings(self, y, u):
@@ -624,8 +629,8 @@ def estimate_fwhm(R):
 	i      = np.isnan(v)
 	v      = v[np.logical_not(i)]
 	# global FWHM estimate:
-	reselsPerNode = np.sqrt(v / (4*log(2)))
-	FWHM   = 1 / reselsPerNode.mean()
+	reselsPerNode = np.sqrt(old_div(v, (4*log(2))))
+	FWHM   = old_div(1, reselsPerNode.mean())
 	return FWHM
 
 
@@ -694,9 +699,9 @@ def resel_counts(R, fwhm=1, element_based=False):
 	nNodes    = b.sum()
 	nClusters = bwlabel(b)[1]
 	if element_based:
-		resels    = nClusters,  float(nNodes)/fwhm
+		resels    = nClusters,  old_div(float(nNodes),fwhm)
 	else:
-		resels    = nClusters,  float(nNodes-nClusters)/fwhm
+		resels    = nClusters,  old_div(float(nNodes-nClusters),fwhm)
 	return resels
 
 
@@ -729,9 +734,9 @@ def resels2fwhm(resels, nNodes, element_based=False):
 		See **rft1d.geom.resel_counts** for details regarding the keyword "element_based"** and node-based vs. element-based sampling.
 	'''
 	if element_based:
-		return float(nNodes) / resels[1]
+		return old_div(float(nNodes), resels[1])
 	else:
-		return float(nNodes - resels[0]) / resels[1]
+		return old_div(float(nNodes - resels[0]), resels[1])
 def resels2fwhm_masked(resels, mask, element_based=False):
 	'''
 	Get the FWHM from resel counts based on a binary field mask

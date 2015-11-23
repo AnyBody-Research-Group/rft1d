@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d
@@ -12,8 +15,8 @@ def here_tstat2(yA, yB):
 	nA,nB  = yA.shape[0], yB.shape[0]
 	mA,mB  = yA.mean(axis=0), yB.mean(axis=0)
 	sA,sB  = yA.std(ddof=1, axis=0), yB.std(ddof=1, axis=0)
-	s      = np.sqrt(    ((nA-1)*sA*sA + (nB-1)*sB*sB)  /  (nA + nB - 2)     )
-	t      = (mA-mB) / ( s *np.sqrt(1.0/nA + 1.0/nB))
+	s      = np.sqrt(    old_div(((nA-1)*sA*sA + (nB-1)*sB*sB),  (nA + nB - 2))     )
+	t      = old_div((mA-mB), ( s *np.sqrt(old_div(1.0,nA) + old_div(1.0,nB))))
 	return t
 
 

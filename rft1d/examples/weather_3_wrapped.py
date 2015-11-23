@@ -6,6 +6,8 @@ This script re-analyzes the data as if it were cyclical
 In this case the upcrossings at the start and end of the cycle
    should be merged.
 '''
+from __future__ import division
+from past.utils import old_div
 
 
 import os
@@ -32,8 +34,8 @@ yB       = gaussian_filter1d(yB, 8.0, axis=1, mode='wrap')
 nA,nB    = yA.shape[0], yB.shape[0]  #sample sizes
 mA,mB    = yA.mean(axis=0), yB.mean(axis=0)  #means
 sA,sB    = yA.std(ddof=1, axis=0), yB.std(ddof=1, axis=0)  #standard deviations
-s        = np.sqrt(    ((nA-1)*sA*sA + (nB-1)*sB*sB)  /  (nA + nB - 2)     )  #pooled standard deviation
-t        = (mA-mB) / ( s *np.sqrt(1.0/nA + 1.0/nB))  #t field
+s        = np.sqrt(    old_div(((nA-1)*sA*sA + (nB-1)*sB*sB),  (nA + nB - 2))     )  #pooled standard deviation
+t        = old_div((mA-mB), ( s *np.sqrt(old_div(1.0,nA) + old_div(1.0,nB))))  #t field
 
 
 
@@ -57,7 +59,7 @@ calc      = rft1d.geom.ClusterMetricCalculator()
 k         = calc.cluster_extents(t, tstar)
 ### merge the start and end upcrossings:
 k         = sum(k)
-k_resels  = k/FWHM
+k_resels  = old_div(k,FWHM)
 hmin      = t[t>tstar].min()
 
 
